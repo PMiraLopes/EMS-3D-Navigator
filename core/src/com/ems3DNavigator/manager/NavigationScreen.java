@@ -150,7 +150,7 @@ public class NavigationScreen
 
     /**
      * Creates a {@link Search} type to be inserted in the table of HUD, to enable the
-     * search box a allow the user to search for some room or group
+     * search box a allow the user to search for some room or group.
      * 
      * @return {@link Search}
      */
@@ -168,7 +168,7 @@ public class NavigationScreen
 
     /**
      * Creates a {@link FloorView} type to be inserted in the table of HUD, to set a view
-     * of only the floor of each room of the model
+     * of only the floor of each room of the model.
      * 
      * @return {@link FloorView}
      */
@@ -186,7 +186,7 @@ public class NavigationScreen
 
     /**
      * Creates a {@link BoxView} type to be inserted in the table of HUD, and change the
-     * view to a box view of the system
+     * view to a box view of the system.
      * 
      * @return {@link BoxView}
      */
@@ -204,7 +204,7 @@ public class NavigationScreen
 
     /**
      * Creates an {@link Overview} type to be inserted in the table of HUD and to change
-     * the view to a perspective overview of the system
+     * the view to a perspective overview of the system.
      * 
      * @return {@link Overview}
      */
@@ -222,7 +222,7 @@ public class NavigationScreen
 
     /**
      * Creates a {@link Home} type to be inserted in the table of HUD, to set the default
-     * view of the system when pressed
+     * view of the system when pressed.
      * 
      * @return {@link Home}
      */
@@ -240,7 +240,7 @@ public class NavigationScreen
 
     /**
      * Creates a {@link TransparentView} type to be inserted in the table of HUD, to set
-     * the default view of the system when pressed
+     * the default view of the system when pressed.
      * 
      * @return {@link TransparentView}
      */
@@ -266,7 +266,7 @@ public class NavigationScreen
 
     /**
      * Creates {@link TextField} with a listener, to check if something were written, and
-     * to be displayed/hide when the user press the {@link Search}
+     * to be displayed/hide when the user press the {@link Search}.
      * 
      * @return {@link TextField}
      */

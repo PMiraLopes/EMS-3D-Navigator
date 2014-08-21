@@ -32,8 +32,8 @@ public class Ems3DNavigator
 
 
     /**
-     * First function to be called when the program starts, this is a default behaviour of
-     * libgdx
+     * First function to be called when the program starts, this is a default behavior of
+     * libgdx.
      */
     public void create() {
 
@@ -55,7 +55,7 @@ public class Ems3DNavigator
     }
 
     /**
-     * Function called when the program needs to perform rendering
+     * Function called when the program needs to perform rendering.
      */
     public void render() {
         super.render();
@@ -63,7 +63,7 @@ public class Ems3DNavigator
 
     /**
      * Last function to be called when the program finish, it is used to free the memory
-     * allocated during the execution
+     * allocated during the execution.
      */
     public void dispose() {
         batch.dispose();
@@ -72,7 +72,7 @@ public class Ems3DNavigator
     }
 
     /**
-     * Function to return the batch to 3D objects
+     * Function to return the batch to 3D objects.
      * 
      * @return {@link ModelBatch}
      */
@@ -81,7 +81,7 @@ public class Ems3DNavigator
     }
 
     /**
-     * Returns the default camera, that is set in the start of the program
+     * Returns the default camera, that is set in the start of the program.
      * 
      * @return {@link PerspectiveCamera}
      */
@@ -90,7 +90,7 @@ public class Ems3DNavigator
     }
 
     /**
-     * Returns the assetManager that was created in the start of the program
+     * Returns the assetManager that was created in the start of the program.
      * 
      * @return {@link AssetManager}
      */
@@ -103,14 +103,14 @@ public class Ems3DNavigator
     }
 
     /**
-     * Function called in the rendering time, to update the camera
+     * Function called in the rendering time, to update the camera.
      */
     public void updateCamera() {
         cameraController.update();
     }
 
     /**
-     * Returns the NavigationScreen object
+     * Returns the NavigationScreen object.
      * 
      * @return {@link NavigationScreen}
      */
@@ -119,7 +119,7 @@ public class Ems3DNavigator
     }
 
     /**
-     * Returns the CameraInputController object
+     * Returns the CameraInputController object.
      * 
      * @return C
      */
@@ -128,7 +128,7 @@ public class Ems3DNavigator
     }
 
     /**
-     * Function to the set values of the default perspective camera
+     * Function to the set values of the default perspective camera.
      */
     public void setCamera() {
         camera3D = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -151,7 +151,7 @@ public class Ems3DNavigator
     }
 
     /**
-     * Add the camera controller as input controller
+     * Add the camera controller as input controller.
      */
     public void setCameraAsInputController() {
         cameraController = new CameraInputController(camera3D);
@@ -159,11 +159,21 @@ public class Ems3DNavigator
     }
 
 
+    /**
+     * Creates the building manager.
+     *
+     * @param {@link ModelInstance}
+     */
     public void createBuildingManager(ModelInstance modelInstance) {
         buildingManager = new BuildingManager(this, modelInstance);
         buildingManager.setNormalView();
     }
 
+    /**
+     * Gets the building manager.
+     *
+     * @return the building manager
+     */
     public BuildingManager getBuildingManager() {
         return buildingManager;
     }

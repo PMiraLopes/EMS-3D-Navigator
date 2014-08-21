@@ -48,7 +48,7 @@ public class BuildingManager {
 
     /**
      * Function used to initialize the hastable buildingRooms, with the data of the model,
-     * creating the rooms with hvac model, lamp model, and floor model
+     * creating the rooms with hvac model, lamp model, and floor model.
      */
     private void createRooms() {
         String[] split, splitIfc, splitIfcAux;
@@ -58,24 +58,30 @@ public class BuildingManager {
         System.out.println("Loading rooms data...");
 
         ifcFile = fileHandle.readString();
-        
+
         for (Node n : model.nodes) {
+            if (n.id.contains("Painel do sistema"))
+                n.parts.get(0).material.set(new BlendingAttribute(GL20.GL_SRC_ALPHA,
+                        GL20.GL_ONE_MINUS_SRC_ALPHA, 0.5f));
+            else
+                n.parts.get(0).material.set(new BlendingAttribute(GL20.GL_SRC_ALPHA,
+                        GL20.GL_ONE_MINUS_SRC_ALPHA, 1f));
 
             if (n.id.contains("Floor:ID")) {
                 split = n.id.split("#");
                 floorId = split[1];
 
-                if (("2-2-6").equals(floorId)) 
+                if (("2-2-6").equals(floorId))
                     floorId = "2-2.6";//SOLVE THIS
 
-                if (("2-N16.4").equals(floorId)){
+                if (("2-N16.4").equals(floorId)) {
                     if (find) {// SOLVE THIS
                         floorId = "2-N16.0";
                         find = false;
                     }
                 }
 
-                if (!floorId.contains(".0")) 
+                if (!floorId.contains(".0"))
                     // to avoid create wrong rooms, because of the group nodes
                     buildingRooms.put(floorId, new Room(n, floorId));
             }
@@ -95,7 +101,7 @@ public class BuildingManager {
                     hvacId = split[1];
                     if (buildingRooms.containsKey(hvacId))
                         buildingRooms.get(hvacId).setHvacNode(k);
-                    ;
+
                 }
             }
         }
@@ -107,19 +113,22 @@ public class BuildingManager {
             if (splitIfc[i].contains("IFCSPACE")) {
                 splitIfcAux = splitIfc[i].split("'");
                 nodeId = splitIfcAux[1];
-                roomId = splitIfcAux[5].replace(",", "."); 
+                roomId = splitIfcAux[5].replace(",", ".");
                 //bug with room 2-N11.7 and box 3fzykY5oTFQ8FBXD78V$TZ 
 
                 if (model.getNode(nodeId) != null && buildingRooms.get(roomId) != null)
                     buildingRooms.get(roomId).setBoxNode(model.getNode(nodeId));
             }
         }
+        
+        addRoomsWalls();
+        printRooms();
 
         System.out.println("Rooms loaded...");
     }
 
     /**
-     * Function to retrieve a room by it's own id, if not exits returns null
+     * Function to retrieve a room by it's own id, if not exits returns null.
      * 
      * @param roomID
      * @return the room
@@ -133,16 +142,20 @@ public class BuildingManager {
      */
     public void printRooms() {
         for (Room r : buildingRooms.values()) {
-            System.out.println(r.getId());
+            System.out.println(r.getId() + " " + r.getPositionVector());
+            System.out.println("===Walls===");
+            for(Node n : r.getWalls())
+                System.out.println(n.id + " " + n.translation);
+            System.out.println("===========");
         }
     }
 
 
     /**
-     * Function to show to the user the room that has been searched in the text box
+     * Function to show to the user the room that has been searched in the text box.
      * 
-     * @param String
-     * @return boolean
+     * @param {@link String} text
+     * @return {@link Boolean}
      */
     public boolean showRoom(String text) {
         Room r = buildingRooms.get(text);
@@ -212,15 +225,13 @@ public class BuildingManager {
 
     /**
      * Changes the view of the system, to a view where each room is a box, hiding all the
-     * meshes unnecessary to this kind of view
+     * meshes unnecessary to this kind of view.
      */
     public void setBoxesView() {
         hideEverything();
         for (Room r : buildingRooms.values()) {
             if (r.getBoxNode() != null)
                 r.getBoxNode().parts.get(0).enabled = true;
-            else
-                System.out.println(r.getId());
         }
 
         /*setOverView();
@@ -241,20 +252,31 @@ public class BuildingManager {
 
     /**
      * Function to change the view of the system, giving a perspective overview of the
-     * model with all meshes
+     * model with all meshes.
      */
     public void setOverView() {
         for (Node n : model.nodes) {
-            n.parts.get(0).enabled = true;
+            if (n.id.contains("Compound Celling"))
+                n.parts.get(0).enabled = false;
+            else
+                n.parts.get(0).enabled = true;
         }
     }
 
     /**
-     * Function to set the default view of the model
+     * Function to set the default view of the model.
      */
     public void setNormalView() {
         app.resetCamera();
-        setOverView();
+        for (Node n : model.nodes) {
+            if (n.id.contains("Basic Wall") || n.id.contains("Railing") || n.id.contains("hvac")
+                    || n.id.contains("lamp") || n.id.contains("Coluna") || n.id.contains("Floor")
+                    || n.id.contains("Painel do sistema"))
+                n.parts.get(0).enabled = true;
+            else
+                n.parts.get(0).enabled = false;
+        }
+
         for (Room r : buildingRooms.values()) {
             if (r.getBoxNode() != null)
                 r.getBoxNode().parts.get(0).enabled = false;
@@ -262,20 +284,40 @@ public class BuildingManager {
     }
 
     private void hideEverything() {
-        for (Node n : model.nodes)
-            n.parts.get(0).enabled = false;
+        for (Node n : model.nodes) {
+            if (n.id.contains("Floor") || n.id.contains("Railing"))
+                n.parts.get(0).enabled = true;
+            else
+                n.parts.get(0).enabled = false;
+        }
     }
 
     public void setTransparentView() {
         if (!transparencyEnabled) {
-            for (Material m : model.materials)
-                m.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.5f));
+            for (Node n : model.nodes)
+                if (!(n.id.contains("hvac") || n.id.contains("lamp")))
+                    n.parts.get(0).material.set(new BlendingAttribute(GL20.GL_SRC_ALPHA,
+                            GL20.GL_ONE_MINUS_SRC_ALPHA, 0.4f));
             transparencyEnabled = true;
         } else {
 
             for (Material m : model.materials)
                 m.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1f));
             transparencyEnabled = false;
+        }
+    }
+    
+    public void addRoomsWalls(){
+        for(Node n : model.nodes){
+            if(n.id.contains("Basic Wall:Gen")){
+              for(Room r : buildingRooms.values()){
+                  System.out.println(r.getId());
+                  if(r.getPositionVector() != null)
+                      if((n.translation.x <= r.getX() + 1 && n.translation.x >= r.getX() - 1) && (n.translation.z <= r.getZ() + 1 && n.translation.z >= r.getZ() - 1))
+                          r.addWall(n);
+              }
+                  
+            }
         }
     }
 }
