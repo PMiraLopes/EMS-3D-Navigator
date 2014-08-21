@@ -5,6 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.ems3DNavigator.manager.BuildingManager;
 
+
+/**
+ * The Class Home that sets the view to the default view of the system.
+ */
 public class Home
         extends ImageButton {
 

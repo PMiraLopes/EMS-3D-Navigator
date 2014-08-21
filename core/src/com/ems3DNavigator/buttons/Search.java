@@ -7,13 +7,34 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.ems3DNavigator.manager.BuildingManager;
 
+/**
+ * The Class Search to allow the user to seach for a desired room.
+ */
 public class Search
         extends ImageButton {
 
+    /**
+     * The manager.
+     */
     private BuildingManager manager;
+    
+    /**
+     * The text box for user input.
+     */
     private Actor textBox;
+    
+    /**
+     * Flag to know if the text box is being displayed or not.
+     */
     private boolean active = false;
 
+    /**
+     * The Constructor.
+     *
+     * @param  ImageButtonStyle style
+     * @param BuildingManagermanager
+     * @param Actor actor
+     */
     public Search(ImageButtonStyle style, BuildingManager manager, Actor actor) {
         super(style);
 
@@ -29,6 +50,9 @@ public class Search
 
     }
 
+    /**
+     * Sets the text box as visible or invisible, and allows the user to insert input with the keyboard.
+     */
     public void showTextBox() {
         if (!active) {
             textBox.setTouchable(Touchable.enabled);

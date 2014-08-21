@@ -21,7 +21,7 @@ import com.ems3DNavigator.constants.APP;
  */
 
 public class Ems3DNavigator
-extends Game {
+        extends Game {
 
     private ModelBatch batch;
     private PerspectiveCamera camera3D;
@@ -48,7 +48,8 @@ extends Game {
 
         loadModel("Tagus");
 
-        navigationScreen = new NavigationScreen(this); // sets the first screen to be the navigation screen of the loaded model
+        navigationScreen = new NavigationScreen(this);
+        // sets the first screen to be the navigation screen of the loaded model
 
         this.setScreen(navigationScreen);
     }
@@ -139,8 +140,8 @@ extends Game {
 
         setCameraAsInputController();
     }
-    
-    public void resetCamera(){
+
+    public void resetCamera() {
         camera3D.position.set(100.0f, 50.0f, 50.0f);
         camera3D.lookAt(50.0f, 0.0f, 0.0f);
         camera3D.near = 1.0f;
@@ -156,15 +157,15 @@ extends Game {
         cameraController = new CameraInputController(camera3D);
         Gdx.input.setInputProcessor(cameraController);
     }
-    
-    
-    public void createBuildingManager(ModelInstance modelInstance){
+
+
+    public void createBuildingManager(ModelInstance modelInstance) {
         buildingManager = new BuildingManager(this, modelInstance);
         buildingManager.setNormalView();
     }
-    
-    public BuildingManager getBuildingManager(){
+
+    public BuildingManager getBuildingManager() {
         return buildingManager;
     }
-    
+
 }

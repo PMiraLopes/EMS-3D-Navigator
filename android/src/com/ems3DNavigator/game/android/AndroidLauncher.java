@@ -6,7 +6,16 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.ems3DNavigator.manager.Ems3DNavigator;
 
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AndroidLauncher.
+ */
 public class AndroidLauncher extends AndroidApplication {
+	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreate(android.os.Bundle)
+	 */
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

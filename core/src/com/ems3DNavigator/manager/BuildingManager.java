@@ -52,28 +52,31 @@ public class BuildingManager {
      */
     private void createRooms() {
         String[] split, splitIfc, splitIfcAux;
-        String floorId = "", lampId = "", hvacId = "", ifcFile = fileHandle.readString(), nodeId, roomId;
+        String floorId = "", lampId = "", hvacId = "", ifcFile, nodeId, roomId;
         boolean find = true;
 
         System.out.println("Loading rooms data...");
 
+        ifcFile = fileHandle.readString();
+        
         for (Node n : model.nodes) {
 
             if (n.id.contains("Floor:ID")) {
                 split = n.id.split("#");
                 floorId = split[1];
 
-                if (floorId.equals("2-2-6")) //SOLVE THIS
-                    floorId = "2-2.6";
+                if (("2-2-6").equals(floorId)) 
+                    floorId = "2-2.6";//SOLVE THIS
 
-                if (floorId.equals("2-N16.4")) {// SOLVE THIS
-                    if (find) {
+                if (("2-N16.4").equals(floorId)){
+                    if (find) {// SOLVE THIS
                         floorId = "2-N16.0";
                         find = false;
                     }
                 }
 
-                if (!floorId.contains(".0")) // to avoid create wrong rooms, because of the group nodes
+                if (!floorId.contains(".0")) 
+                    // to avoid create wrong rooms, because of the group nodes
                     buildingRooms.put(floorId, new Room(n, floorId));
             }
         }
@@ -104,7 +107,8 @@ public class BuildingManager {
             if (splitIfc[i].contains("IFCSPACE")) {
                 splitIfcAux = splitIfc[i].split("'");
                 nodeId = splitIfcAux[1];
-                roomId = splitIfcAux[5].replace(",", "."); // there is a bug with room 2-N11.7 and box 3fzykY5oTFQ8FBXD78V$TZ 
+                roomId = splitIfcAux[5].replace(",", "."); 
+                //bug with room 2-N11.7 and box 3fzykY5oTFQ8FBXD78V$TZ 
 
                 if (model.getNode(nodeId) != null && buildingRooms.get(roomId) != null)
                     buildingRooms.get(roomId).setBoxNode(model.getNode(nodeId));
@@ -137,8 +141,8 @@ public class BuildingManager {
     /**
      * Function to show to the user the room that has been searched in the text box
      * 
-     * @param user text input
-     * @return
+     * @param String
+     * @return boolean
      */
     public boolean showRoom(String text) {
         Room r = buildingRooms.get(text);
@@ -241,7 +245,7 @@ public class BuildingManager {
      */
     public void setOverView() {
         for (Node n : model.nodes) {
-          n.parts.get(0).enabled = true;
+            n.parts.get(0).enabled = true;
         }
     }
 
@@ -251,9 +255,9 @@ public class BuildingManager {
     public void setNormalView() {
         app.resetCamera();
         setOverView();
-        for(Room r :  buildingRooms.values()){
-            if(r.getBoxNode() != null)
-            r.getBoxNode().parts.get(0).enabled = false;
+        for (Room r : buildingRooms.values()) {
+            if (r.getBoxNode() != null)
+                r.getBoxNode().parts.get(0).enabled = false;
         }
     }
 
@@ -268,7 +272,7 @@ public class BuildingManager {
                 m.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.5f));
             transparencyEnabled = true;
         } else {
-            
+
             for (Material m : model.materials)
                 m.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1f));
             transparencyEnabled = false;

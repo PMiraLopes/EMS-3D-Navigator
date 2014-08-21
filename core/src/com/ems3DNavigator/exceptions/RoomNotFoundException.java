@@ -1,5 +1,9 @@
 package com.ems3DNavigator.exceptions;
 
+/**
+ * @author PedroLopes
+ *
+ */
 public class RoomNotFoundException extends RuntimeException{
 
     /**

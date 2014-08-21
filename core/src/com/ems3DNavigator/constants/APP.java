@@ -1,5 +1,10 @@
 package com.ems3DNavigator.constants;
 
+/**
+ * Class that contains the constants of the program
+ * @author PedroLopes
+ *
+ */
 public class APP {
     //Folders
     public static final String BUILDINGS = "buildings/";

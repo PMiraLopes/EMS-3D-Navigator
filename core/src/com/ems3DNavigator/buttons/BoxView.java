@@ -5,24 +5,41 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.ems3DNavigator.manager.BuildingManager;
 
-public class BoxView extends ImageButton{
-    private BuildingManager manager;
+/**
+ * The Class BoxView.
+ */
+public class BoxView
+        extends ImageButton {
     
-    public BoxView(ImageButtonStyle style, BuildingManager manager){
+    /**
+     * The manager.
+     */
+    private BuildingManager manager;
+
+    /**
+     * The Constructor.
+     *
+     * @param style the style
+     * @param manager the manager
+     */
+    public BoxView(ImageButtonStyle style, BuildingManager manager) {
         super(style);
-        
+
         this.manager = manager;
 
-        addListener(new ClickListener(){
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+        addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 boxView();
                 return true;
             }
         });
     }
-    
-    private void boxView(){
+
+    /**
+     * Box view.
+     */
+    private void boxView() {
         this.manager.setBoxesView();
     }
-     
+
 }

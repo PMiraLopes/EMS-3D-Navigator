@@ -5,11 +5,24 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.ems3DNavigator.manager.BuildingManager;
 
+/**
+ * The Class TransparentView, sets all materials of the system as transparent, allowing
+ * the user to see through the objects.
+ */
 public class TransparentView
         extends ImageButton {
 
+    /**
+     * The manager.
+     */
     private BuildingManager manager;
 
+    /**
+     * The Constructor.
+     *
+     * @param ImageButtonStyle style
+     * @param BuildingManager manager
+     */
     public TransparentView(ImageButtonStyle style, BuildingManager manager) {
         super(style);
 
@@ -17,13 +30,16 @@ public class TransparentView
 
         addListener(new ClickListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                tranparentView();
+                transparentView();
                 return true;
             }
         });
     }
 
-    private void tranparentView() {
+    /**
+     * Enables or disables the transparent view.
+     */
+    private void transparentView() {
         this.manager.setTransparentView();
     }
 
