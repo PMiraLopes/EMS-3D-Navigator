@@ -11,6 +11,8 @@ public class APP {
     public static final String MODEL_EXTENSION = ".g3dj";
     public static final String BUTTONS = "buttons/";
     public static final String SKINS = "skins/uiskin/";
+    public static final String MODEL = "tagusIFC";
+    
     //Buttons
     public static final String SEARCH_BUTTON = "buttons/Search.png";
     public static final String SEARCH_SELECTED_BUTTON = "buttons/SearchSelected.png";
@@ -24,4 +26,5 @@ public class APP {
     public static final String OVERVIEW_SELECTED_BUTTON = "buttons/OverviewSelected.png";
     public static final String TRANSPARENT_BUTTON = "buttons/Transparency.png";
     public static final String TRANSPARENT_SELECTED_BUTTON = "buttons/TransparencySelected.png";
+    
 }

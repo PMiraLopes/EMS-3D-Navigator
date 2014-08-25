@@ -73,7 +73,7 @@ public class NavigationScreen
     public void doneLoading() {
 
         modelInstances.add(new ModelInstance(application.getAssetManager()
-                .get(APP.BUILDINGS + "Tagus" + APP.MODEL_EXTENSION, Model.class)));
+                .get(APP.BUILDINGS + APP.MODEL + APP.MODEL_EXTENSION, Model.class)));
 
         application.createBuildingManager(modelInstances.first());
 
@@ -89,7 +89,7 @@ public class NavigationScreen
     @Override
     public void render(float delta) {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.gl.glClearColor(0.7f, 1.0f, 1.0f, 0.2f);
+        Gdx.gl.glClearColor(0.0f,0.2f,1f, 0.2f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);

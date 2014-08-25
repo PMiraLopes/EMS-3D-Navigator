@@ -46,7 +46,7 @@ public class Ems3DNavigator
 
         setCamera();
 
-        loadModel("Tagus");
+        loadModel(APP.MODEL);
 
         navigationScreen = new NavigationScreen(this);
         // sets the first screen to be the navigation screen of the loaded model

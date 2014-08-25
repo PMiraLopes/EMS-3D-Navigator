@@ -36,7 +36,7 @@ public class BuildingManager {
 
         buildingRooms = new Hashtable<String, Room>();
 
-        fileHandle = Gdx.files.internal(APP.BUILDINGS + "Taguspark-2.52.ifc");
+        fileHandle = Gdx.files.internal(APP.BUILDINGS + "tagus.ifc");
 
         createRooms();
 
@@ -53,13 +53,13 @@ public class BuildingManager {
     private void createRooms() {
         String[] split, splitIfc, splitIfcAux;
         String floorId = "", lampId = "", hvacId = "", ifcFile, nodeId, roomId;
-        boolean find = true;
 
         System.out.println("Loading rooms data...");
 
         ifcFile = fileHandle.readString();
 
         for (Node n : model.nodes) {
+            // System.out.println(n.id);
             if (n.id.contains("Painel do sistema"))
                 n.parts.get(0).material.set(new BlendingAttribute(GL20.GL_SRC_ALPHA,
                         GL20.GL_ONE_MINUS_SRC_ALPHA, 0.5f));
@@ -71,18 +71,7 @@ public class BuildingManager {
                 split = n.id.split("#");
                 floorId = split[1];
 
-                if (("2-2-6").equals(floorId))
-                    floorId = "2-2.6";//SOLVE THIS
-
-                if (("2-N16.4").equals(floorId)) {
-                    if (find) {// SOLVE THIS
-                        floorId = "2-N16.0";
-                        find = false;
-                    }
-                }
-
-                if (!floorId.contains(".0"))
-                    // to avoid create wrong rooms, because of the group nodes
+                if (!floorId.contains(".0"))// to avoid create wrong rooms, because of the group nodes
                     buildingRooms.put(floorId, new Room(n, floorId));
             }
         }
@@ -114,13 +103,12 @@ public class BuildingManager {
                 splitIfcAux = splitIfc[i].split("'");
                 nodeId = splitIfcAux[1];
                 roomId = splitIfcAux[5].replace(",", ".");
-                //bug with room 2-N11.7 and box 3fzykY5oTFQ8FBXD78V$TZ 
 
                 if (model.getNode(nodeId) != null && buildingRooms.get(roomId) != null)
                     buildingRooms.get(roomId).setBoxNode(model.getNode(nodeId));
             }
         }
-        
+
         addRoomsWalls();
         printRooms();
 
@@ -142,11 +130,7 @@ public class BuildingManager {
      */
     public void printRooms() {
         for (Room r : buildingRooms.values()) {
-            System.out.println(r.getId() + " " + r.getPositionVector());
-            System.out.println("===Walls===");
-            for(Node n : r.getWalls())
-                System.out.println(n.id + " " + n.translation);
-            System.out.println("===========");
+            System.out.println(r.getId());
         }
     }
 
@@ -209,7 +193,7 @@ public class BuildingManager {
 
     /**
      * Function to change the type of view over the model, in this case it shows only the
-     * floor of each room
+     * floor of each room.
      */
     public void setFloorView() {
         setOverView();
@@ -306,17 +290,18 @@ public class BuildingManager {
             transparencyEnabled = false;
         }
     }
-    
-    public void addRoomsWalls(){
-        for(Node n : model.nodes){
-            if(n.id.contains("Basic Wall:Gen")){
-              for(Room r : buildingRooms.values()){
-                  System.out.println(r.getId());
-                  if(r.getPositionVector() != null)
-                      if((n.translation.x <= r.getX() + 1 && n.translation.x >= r.getX() - 1) && (n.translation.z <= r.getZ() + 1 && n.translation.z >= r.getZ() - 1))
-                          r.addWall(n);
-              }
-                  
+
+    public void addRoomsWalls() {
+        for (Node n : model.nodes) {
+            if (n.id.contains("Basic Wall:Gen")) {
+                for (Room r : buildingRooms.values()) {
+                    if (r.getPositionVector() != null)
+                        if ((n.translation.x <= r.getX() + 1 && n.translation.x >= r.getX() - 1)
+                                && (n.translation.z <= r.getZ() + 1 
+                                    && n.translation.z >= r.getZ() - 1))
+                            r.addWall(n);
+                }
+
             }
         }
     }
