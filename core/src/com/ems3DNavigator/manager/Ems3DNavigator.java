@@ -15,7 +15,7 @@ import com.ems3DNavigator.constants.APP;
 
 /**
  * This is the base class of the program, it is used when the program starts setting the
- * values to the cameras, batch, and loading the models that gona be displayed to the user
+ * values to the cameras, batch, and loading the models that going to be displayed to user.
  * 
  * @author PedroLopes
  */
@@ -162,11 +162,13 @@ public class Ems3DNavigator
     /**
      * Creates the building manager.
      *
-     * @param {@link ModelInstance}
+     * @param {@link ModelInstance} modelInstance
      */
     public void createBuildingManager(ModelInstance modelInstance) {
         buildingManager = new BuildingManager(this, modelInstance);
         buildingManager.setNormalView();
+        navigationScreen.getPointer().nodes.get(0).parts.get(0).enabled = false;
+
     }
 
     /**

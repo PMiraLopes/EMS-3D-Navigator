@@ -3,15 +3,21 @@ package com.ems3DNavigator.manager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
@@ -27,13 +33,15 @@ import com.ems3DNavigator.buttons.Home;
 import com.ems3DNavigator.buttons.Overview;
 import com.ems3DNavigator.buttons.Search;
 import com.ems3DNavigator.buttons.TransparentView;
+import com.ems3DNavigator.buttons.ViewButton;
 import com.ems3DNavigator.constants.APP;
+
 
 /**
  * This class is the main interface of the system, is where the model will be presented to
  * the user, and where the user can interact with the model, choosing different kinds of
  * views of the system and inspected the information of the consumptions of the building,
- * each room or group of rooms
+ * each room or group of rooms.
  * 
  * @author PedroLopes
  */
@@ -50,6 +58,7 @@ public class NavigationScreen
     private TextureRegion upTextureRegion, downTextureRegion;
     private TextureRegionDrawable upImage, downImage;
     private ImageButtonStyle style;
+    private ModelInstance pointer;
 
     public NavigationScreen(Ems3DNavigator app) {
 
@@ -74,6 +83,15 @@ public class NavigationScreen
 
         modelInstances.add(new ModelInstance(application.getAssetManager()
                 .get(APP.BUILDINGS + APP.MODEL + APP.MODEL_EXTENSION, Model.class)));
+        
+        ModelBuilder modelBuilder = new ModelBuilder();
+        Model cone =
+            modelBuilder.createCone(2, 2, 2, 100,
+                                    new Material(ColorAttribute.createDiffuse(Color.GREEN)),
+                                    Usage.Position | Usage.Normal);
+        pointer = new ModelInstance(cone);
+        pointer.transform.rotate(Vector3.Z, 180);
+        modelInstances.add(pointer);
 
         application.createBuildingManager(modelInstances.first());
 
@@ -84,12 +102,12 @@ public class NavigationScreen
     }
 
     /**
-     * Function to render the model and the HUD
+     * Function to render the model and the HUD.
      */
     @Override
     public void render(float delta) {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.gl.glClearColor(0.0f,0.2f,1f, 0.2f);
+        Gdx.gl.glClearColor(0.0f, 0.7f, 1f, 0.2f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -113,29 +131,41 @@ public class NavigationScreen
 
     /**
      * Sets the HUD to be displayed to the user, putting some buttons in a {@link Table},
-     * that will be drawn by a 2D batch ( {@link SpriteBatch} )
+     * that will be drawn by a 2D batch ( {@link SpriteBatch} ).
      */
     private void setHUD() {
+
+
         stage = new Stage();
         Table table = new Table();
+
+        Array<Actor> actors = new Array<Actor>();
+
+        Home homeButton = createHomeButton();
+        FloorView floorViewButton = createFloorViewButton();
+        BoxView boxViewButton = createBoxViewButton();
+        Overview overviewButton = createOverviewButton();
+        TextField textField = createTextField();
+
+        actors.add(homeButton);
+        actors.add(floorViewButton);
+        actors.add(boxViewButton);
+        actors.add(overviewButton);
 
         table.setFillParent(true);
 
         table.top().left();
 
-        TextField textField = createTextField();
-
         table.add(createSearchButton(textField));
         table.add(textField);
-        table.add(createTransparentButton()).right().expandX();
         table.row();
-        table.add(createHomeButton());
+        table.add(createViewButton(actors));
+        table.add(homeButton).space(0);
+        table.add(floorViewButton);
+        table.add(boxViewButton);
+        table.add(overviewButton);
         table.row();
-        table.add(createFloorViewButton());
-        table.row();
-        table.add(createBoxViewButton());
-        table.row();
-        table.add(createOverviewButton());
+        table.add(createTransparentButton());
         table.row();
 
         stage.addActor(table);
@@ -163,7 +193,7 @@ public class NavigationScreen
 
         defineStyle();
 
-        return new Search(style, application.getBuildingManager(), textField);
+        return new Search(style, textField);
     }
 
     /**
@@ -210,7 +240,8 @@ public class NavigationScreen
      */
     private Overview createOverviewButton() {
         upTextureRegion = new TextureRegion(new Texture(Gdx.files.internal(APP.OVERVIEW_BUTTON)));
-        downTextureRegion = new TextureRegion(new Texture(Gdx.files.internal(APP.OVERVIEW_BUTTON)));
+        downTextureRegion =
+            new TextureRegion(new Texture(Gdx.files.internal(APP.OVERVIEW_SELECTED_BUTTON)));
         upImage = new TextureRegionDrawable(upTextureRegion);
         downImage = new TextureRegionDrawable(downTextureRegion);
 
@@ -291,6 +322,31 @@ public class NavigationScreen
         textField.setTouchable(Touchable.disabled);
 
         return textField;
+    }
+
+    /**
+     * Creates a {@link ViewButton} to show the different views that the system supports.
+     * 
+     * @return {@link Search}
+     */
+    private ViewButton createViewButton(Array<Actor> actors) {
+        upTextureRegion = new TextureRegion(new Texture(Gdx.files.internal(APP.VIEW_BUTTON)));
+        downTextureRegion =
+            new TextureRegion(new Texture(Gdx.files.internal(APP.VIEW_SELECTED_BUTTON)));
+        upImage = new TextureRegionDrawable(upTextureRegion);
+        downImage = new TextureRegionDrawable(downTextureRegion);
+
+        defineStyle();
+        for (Actor actor : actors) {
+            actor.setVisible(false);
+            actor.setTouchable(Touchable.disabled);
+        }
+
+        return new ViewButton(style, actors);
+    }
+    
+    public ModelInstance getPointer(){
+        return pointer;
     }
 
 

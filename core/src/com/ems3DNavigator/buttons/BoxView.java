@@ -6,7 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.ems3DNavigator.manager.BuildingManager;
 
 /**
- * The Class BoxView that changes the view of the scene to one where the rooms are boxes, and all the system is shown as a set of boxes.
+ * The Class BoxView that changes the view of the scene to one where the rooms are boxes,
+ * and all the system is shown as a set of boxes.
  */
 public class BoxView
         extends ImageButton {

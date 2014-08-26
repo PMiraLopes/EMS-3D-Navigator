@@ -5,35 +5,36 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.ems3DNavigator.manager.BuildingManager;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
+import com.badlogic.gdx.utils.Array;
 
+// TODO: Auto-generated Javadoc
 /**
- * The Class Search to allow the user to seach for a desired room.
+ * The Class ViewButton.
  */
-public class Search
+public class ViewButton
         extends ImageButton {
-
+    
     /**
-     * The text box for user input.
+     * The actors list.
      */
-    private Actor textBox;
-
+    private Array<Actor> actors;
+    
     /**
-     * Flag to know if the text box is being displayed or not.
+     * The active flag.
      */
     private boolean active = false;
 
     /**
      * The Constructor.
      *
-     * @param {@link ImageButtonStyle}
-     * @param {@link BuildingManager}BuildingManager
-     * @param {@link Actor}
+     * @param style the style
+     * @param actors the actors
      */
-    public Search(ImageButtonStyle style, Actor actor) {
+    public ViewButton(ImageButtonStyle style, Array<Actor> actors) {
         super(style);
 
-        this.textBox = actor;
+        this.actors = actors;
 
         addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -50,12 +51,17 @@ public class Search
      */
     public void showTextBox() {
         if (!active) {
-            textBox.setTouchable(Touchable.enabled);
-            textBox.setVisible(true);
+            for (Actor actor : actors) {
+                actor.setTouchable(Touchable.enabled);
+                actor.setVisible(true);
+            }
             active = true;
         } else {
-            textBox.setTouchable(Touchable.disabled);
-            textBox.setVisible(false);
+
+            for (Actor actor : actors) {
+                actor.setTouchable(Touchable.disabled);
+                actor.setVisible(false);
+            }
             active = false;
         }
     }

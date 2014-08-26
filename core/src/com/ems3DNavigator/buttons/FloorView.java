@@ -2,6 +2,7 @@ package com.ems3DNavigator.buttons;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.ems3DNavigator.manager.BuildingManager;
 import com.ems3DNavigator.manager.Room;

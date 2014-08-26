@@ -27,7 +27,7 @@ public class Overview extends ImageButton{
         this.manager = manager;
 
         addListener(new ClickListener(){
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 overview();
                 return true;
             }

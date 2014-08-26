@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 
 /**
  * This class is used to store each room information, the nodes in the model, material,
- * id, position and the information related to the energy consumption of the room
+ * id, position and the information related to the energy consumption of the room.
  * 
  * @author PedroLopes
  */
@@ -39,7 +39,7 @@ public class Room {
     }
 
     /**
-     * Returns the Floor {@link Node} of the room
+     * Returns the Floor {@link Node} of the room.
      * 
      * @return {@link Node}
      */
@@ -48,7 +48,7 @@ public class Room {
     }
 
     /**
-     * Returns the Box {@link Node} of the room
+     * Returns the Box {@link Node} of the room.
      * 
      * @return {@link Node}
      */
@@ -57,7 +57,7 @@ public class Room {
     }
 
     /**
-     * Returns the {@link Room} own Id
+     * Returns the {@link Room} own Id.
      * 
      * @return {@link String}
      */
@@ -66,7 +66,7 @@ public class Room {
     }
 
     /**
-     * Returns the Floor {@link Material} of the {@link Room}
+     * Returns the Floor {@link Material} of the {@link Room}.
      * 
      * @return {@link Material}
      */
@@ -75,7 +75,7 @@ public class Room {
     }
 
     /**
-     * Returns the {@link MeshPart} of the Floor node of the {@link Room}
+     * Returns the {@link MeshPart} of the Floor node of the {@link Room}.
      * 
      * @return {@link MeshPart}
      */
@@ -84,7 +84,7 @@ public class Room {
     }
 
     /**
-     * Returns the x coordinate of the {@link Room} position
+     * Returns the x coordinate of the {@link Room} position.
      * 
      * @return {@link Float}
      */
@@ -93,7 +93,7 @@ public class Room {
     }
 
     /**
-     * Returns the y coordinate of the {@link Room} position
+     * Returns the y coordinate of the {@link Room} position.
      * 
      * @return {@link Float}
      */
@@ -102,7 +102,7 @@ public class Room {
     }
 
     /**
-     * Returns the z coordinate of the {@link Room} position
+     * Returns the z coordinate of the {@link Room} position.
      * 
      * @return {@link Float}
      */
@@ -111,16 +111,16 @@ public class Room {
     }
 
     /**
-     * Sets the {@link Room} position to a given position
+     * Sets the {@link Room} position to a given position.
      * 
-     * @param position
+     * @param {@link Vector3} position
      */
     public void setPositionVector(Vector3 position) {
         this.position = position;
     }
 
     /**
-     * Returns the {@link Room}'s position
+     * Returns the {@link Room}'s position.
      * 
      * @return {@link Vector3}
      */
@@ -129,9 +129,9 @@ public class Room {
     }
 
     /**
-     * Sets the {@link Room}'s lamp {@link Node} to a given node
+     * Sets the {@link Room}'s lamp {@link Node} to a given node.
      * 
-     * @param lamp
+     * @param {@link Node} lamp
      */
     public void setLampNode(Node lamp) {
         this.lampNode = lamp;
@@ -143,7 +143,7 @@ public class Room {
     }
 
     /**
-     * Sets the {@link Room} Hvac {@link Node}
+     * Sets the {@link Room} Hvac {@link Node}.
      * 
      * @param hvac Node
      */
@@ -152,7 +152,7 @@ public class Room {
     }
 
     /**
-     * Sets the {@link Room} Box {@link Node}
+     * Sets the {@link Room} Box {@link Node}.
      * 
      * @param box Node
      */

@@ -4,12 +4,10 @@ import java.util.Hashtable;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.ems3DNavigator.constants.APP;
 
@@ -26,7 +24,6 @@ public class BuildingManager {
     private ModelInstance model;
     private Ems3DNavigator app;
     private Room lastRoomSelected;
-    private Material selectionMaterial;
     private FileHandle fileHandle;
     private boolean transparencyEnabled = false;
 
@@ -41,8 +38,6 @@ public class BuildingManager {
         createRooms();
 
         lastRoomSelected = null;
-
-        selectionMaterial = new Material(ColorAttribute.createDiffuse(Color.MAROON));
     }
 
 
@@ -59,10 +54,10 @@ public class BuildingManager {
         ifcFile = fileHandle.readString();
 
         for (Node n : model.nodes) {
-            // System.out.println(n.id);
             if (n.id.contains("Painel do sistema"))
                 n.parts.get(0).material.set(new BlendingAttribute(GL20.GL_SRC_ALPHA,
                         GL20.GL_ONE_MINUS_SRC_ALPHA, 0.5f));
+            //Just to show the glass doors
             else
                 n.parts.get(0).material.set(new BlendingAttribute(GL20.GL_SRC_ALPHA,
                         GL20.GL_ONE_MINUS_SRC_ALPHA, 1f));
@@ -71,7 +66,8 @@ public class BuildingManager {
                 split = n.id.split("#");
                 floorId = split[1];
 
-                if (!floorId.contains(".0"))// to avoid create wrong rooms, because of the group nodes
+                if (!floorId.contains(".0"))
+                    // to avoid create wrong rooms, because of the group nodes
                     buildingRooms.put(floorId, new Room(n, floorId));
             }
         }
@@ -109,9 +105,6 @@ public class BuildingManager {
             }
         }
 
-        addRoomsWalls();
-        printRooms();
-
         System.out.println("Rooms loaded...");
     }
 
@@ -126,7 +119,7 @@ public class BuildingManager {
     }
 
     /**
-     * Prints the id of all rooms of the model
+     * Prints the id of all rooms of the model.
      */
     public void printRooms() {
         for (Room r : buildingRooms.values()) {
@@ -150,31 +143,13 @@ public class BuildingManager {
         float x = r.getX();
         float y = r.getY();
         float z = r.getZ();
+        
+        app.getNavigationScreen().getPointer().transform.setTranslation(r.getX(), r.getY() + 5,
+                                                                        r.getZ());
+        app.getNavigationScreen().getPointer().nodes.get(0).parts.get(0).enabled = true;
+      
 
-        r.selectRoom(selectionMaterial);
-
-        for (Room k : buildingRooms.values()) {
-            if (!k.getId().equals(text)) {
-                if (k.getBoxNode() != null) {
-                    k.getBoxNode().parts.get(0).material.set(new BlendingAttribute(
-                            GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.5f));
-                }
-                if (k.getFloorNode() != null) {
-                    k.getFloorNode().parts.get(0).material.set(new BlendingAttribute(
-                            GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.5f));
-                }
-                if (k.getHvacNode() != null) {
-                    k.getHvacNode().parts.get(0).material.set(new BlendingAttribute(
-                            GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.5f));
-                }
-                if (k.getLampNode() != null) {
-                    k.getLampNode().parts.get(0).material.set(new BlendingAttribute(
-                            GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.5f));
-                }
-            }
-        }
-
-        app.getPerspectiveCamera().position.set(x, y + 30, z);
+        app.getPerspectiveCamera().position.set(x, y + 30, z + 30);
         app.getPerspectiveCamera().lookAt(r.getPositionVector());
         app.getPerspectiveCamera().near = 1.0f;
         app.getPerspectiveCamera().far = 300.0f;
@@ -216,22 +191,11 @@ public class BuildingManager {
         for (Room r : buildingRooms.values()) {
             if (r.getBoxNode() != null)
                 r.getBoxNode().parts.get(0).enabled = true;
+            if (r.getLampNode() != null)
+                r.getLampNode().parts.get(0).enabled = true;
+            if (r.getHvacNode() != null)
+                r.getHvacNode().parts.get(0).enabled = true;
         }
-
-        /*setOverView();
-        for (Node n : model.nodes) {
-            if (n.id.contains("lamp") || n.id.contains("hvac")
-                    || n.id.contains("Basic Wall") || n.id.contains("Painel do sistema")
-                    || n.id.contains("M_Concreto-Redondo-Coluna")
-                    || n.id.contains("Compound Ceiling:Plano"))
-                n.parts.get(0).enabled = false;
-            else {
-                if(n.id.contains("1uFc0789j8FgFBNv8rClfI"))
-                    n.parts.get(0).enabled = false;
-                else
-                    n.parts.get(0).enabled = true;
-            }
-        }*/
     }
 
     /**
@@ -252,18 +216,12 @@ public class BuildingManager {
      */
     public void setNormalView() {
         app.resetCamera();
+        hideEverything();
         for (Node n : model.nodes) {
             if (n.id.contains("Basic Wall") || n.id.contains("Railing") || n.id.contains("hvac")
                     || n.id.contains("lamp") || n.id.contains("Coluna") || n.id.contains("Floor")
                     || n.id.contains("Painel do sistema"))
                 n.parts.get(0).enabled = true;
-            else
-                n.parts.get(0).enabled = false;
-        }
-
-        for (Room r : buildingRooms.values()) {
-            if (r.getBoxNode() != null)
-                r.getBoxNode().parts.get(0).enabled = false;
         }
     }
 
@@ -281,28 +239,13 @@ public class BuildingManager {
             for (Node n : model.nodes)
                 if (!(n.id.contains("hvac") || n.id.contains("lamp")))
                     n.parts.get(0).material.set(new BlendingAttribute(GL20.GL_SRC_ALPHA,
-                            GL20.GL_ONE_MINUS_SRC_ALPHA, 0.4f));
+                            GL20.GL_ONE_MINUS_SRC_ALPHA, 0.2f));
             transparencyEnabled = true;
         } else {
 
             for (Material m : model.materials)
                 m.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1f));
             transparencyEnabled = false;
-        }
-    }
-
-    public void addRoomsWalls() {
-        for (Node n : model.nodes) {
-            if (n.id.contains("Basic Wall:Gen")) {
-                for (Room r : buildingRooms.values()) {
-                    if (r.getPositionVector() != null)
-                        if ((n.translation.x <= r.getX() + 1 && n.translation.x >= r.getX() - 1)
-                                && (n.translation.z <= r.getZ() + 1 
-                                    && n.translation.z >= r.getZ() - 1))
-                            r.addWall(n);
-                }
-
-            }
         }
     }
 }
