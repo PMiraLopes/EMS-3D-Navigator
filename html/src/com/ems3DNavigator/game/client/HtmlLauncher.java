@@ -3,7 +3,7 @@ package com.ems3DNavigator.game.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.ems3DNavigator.manager.Ems3DNavigator;
+import com.ems3DNavigator.app.Ems3DNavigator;
 
 public class HtmlLauncher extends GwtApplication {
 

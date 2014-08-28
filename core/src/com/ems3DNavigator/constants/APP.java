@@ -104,4 +104,35 @@ public class APP {
      */
     public static final String VIEW_SELECTED_BUTTON = "buttons/viewSelected.png";
     
+    /**
+     * The Constant HVAC_BUTTON.
+     */
+    public static final String HVAC_BUTTON = "buttons/hvac.png";
+    
+    /**
+     * The Constant ELECTRICITY_BUTTON.
+     */
+    public static final String ELECTRICITY_BUTTON = "buttons/electricity.png";
+    
+    /**
+     * The Constant PERSON_BUTTON.
+     */
+    public static final String PERSON_BUTTON = "buttons/person.png";
+    
+    /**
+     * The Constant LAMP_BUTTON.
+     */
+    public static final String LAMP_BUTTON = "buttons/lamp.png";
+    
+
+    /**
+     * The Constant PERSON_BUTTON.
+     */
+    public static final String LIGHTS_BUTTON = "buttons/lights.png";
+    
+    /**
+     * The Constant LAMP_BUTTON.
+     */
+    public static final String LIGHTS_SELECTED_BUTTON = "buttons/lightsSelected.png";
+    
 }

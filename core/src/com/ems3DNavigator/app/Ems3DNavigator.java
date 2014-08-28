@@ -1,4 +1,4 @@
-package com.ems3DNavigator.manager;
+package com.ems3DNavigator.app;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Vector3;
 import com.ems3DNavigator.constants.APP;
+import com.ems3DNavigator.manager.BuildingManager;
+import com.ems3DNavigator.screens.NavigationScreen;
 
 
 /**

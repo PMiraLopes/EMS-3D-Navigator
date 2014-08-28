@@ -1,143 +1,60 @@
 package com.ems3DNavigator.manager;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.ems3DNavigator.buildingData.Room;
 import com.ems3DNavigator.buttons.BoxView;
 import com.ems3DNavigator.buttons.FloorView;
 import com.ems3DNavigator.buttons.Home;
+import com.ems3DNavigator.buttons.Lights;
 import com.ems3DNavigator.buttons.Overview;
 import com.ems3DNavigator.buttons.Search;
 import com.ems3DNavigator.buttons.TransparentView;
 import com.ems3DNavigator.buttons.ViewButton;
 import com.ems3DNavigator.constants.APP;
-
+import com.ems3DNavigator.screens.NavigationScreen;
 
 /**
- * This class is the main interface of the system, is where the model will be presented to
- * the user, and where the user can interact with the model, choosing different kinds of
- * views of the system and inspected the information of the consumptions of the building,
- * each room or group of rooms.
- * 
- * @author PedroLopes
+ * This class is used to manage the interface of the application, setting the widgets and
+ * the information of the rooms.
  */
-public class NavigationScreen
-        extends ScreenAdapter {
-
-    private Stage stage;
-    private InputMultiplexer multiplexer;
-
-    private final Ems3DNavigator application;
-    private Array<ModelInstance> modelInstances = new Array<ModelInstance>();
-    private boolean loading;
-    private Environment env;
+public class InterfaceManager {
+    private BuildingManager manager;
+    private NavigationScreen navScreen;
     private TextureRegion upTextureRegion, downTextureRegion;
     private TextureRegionDrawable upImage, downImage;
     private ImageButtonStyle style;
-    private ModelInstance pointer;
+    private Table widgetsTable;
+    private Table infoTable;
+    private Skin uiSkin;
 
-    public NavigationScreen(Ems3DNavigator app) {
-
-        application = app;
-
-        env = new Environment();
-        env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.3f, 0.3f, 0.3f, 1.0f));
-        env.add(new DirectionalLight().set(0.4f, 0.4f, 0.4f, -1.0f, -1.0f, -1.0f));
-
-        loading = true;
-
-    }
-
-    /**
-     * This function is used only one time when the system starts, to load the model to
-     * memory, create a {@link BuildingManager} to manage the rooms and it's information,
-     * and in the end sets the view to the user. In the end of the function (setHUD) it
-     * calls a function to display the different buttons so that the user can interact
-     * with the system
-     */
-    public void doneLoading() {
-
-        modelInstances.add(new ModelInstance(application.getAssetManager()
-                .get(APP.BUILDINGS + APP.MODEL + APP.MODEL_EXTENSION, Model.class)));
-        
-        ModelBuilder modelBuilder = new ModelBuilder();
-        Model cone =
-            modelBuilder.createCone(2, 2, 2, 100,
-                                    new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-                                    Usage.Position | Usage.Normal);
-        pointer = new ModelInstance(cone);
-        pointer.transform.rotate(Vector3.Z, 180);
-        modelInstances.add(pointer);
-
-        application.createBuildingManager(modelInstances.first());
-
-        setHUD();
-
-        loading = false;
-
-    }
-
-    /**
-     * Function to render the model and the HUD.
-     */
-    @Override
-    public void render(float delta) {
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.gl.glClearColor(0.0f, 0.7f, 1f, 0.2f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-        application.updateCamera();
-
-        if (loading && application.getAssetManager().update())
-            doneLoading();
-
-        application.getModelBatch().begin(application.getPerspectiveCamera());
-        application.getModelBatch().render(modelInstances, env);
-        application.getModelBatch().end();
-
-        if (!loading) {
-            stage.act(Gdx.graphics.getDeltaTime());
-            stage.draw();
-            application.updateCamera();
-        }
-
+    public InterfaceManager(NavigationScreen navScreen, BuildingManager manager) {
+        this.navScreen = navScreen;
+        this.manager = manager;
+        uiSkin = new Skin(Gdx.files.internal(APP.SKINS + "uiskin.json"));
     }
 
     /**
      * Sets the HUD to be displayed to the user, putting some buttons in a {@link Table},
      * that will be drawn by a 2D batch ( {@link SpriteBatch} ).
      */
-    private void setHUD() {
+    public void setHUD() {
 
-
-        stage = new Stage();
-        Table table = new Table();
+        widgetsTable = new Table();
+        infoTable = new Table();
 
         Array<Actor> actors = new Array<Actor>();
 
@@ -152,31 +69,35 @@ public class NavigationScreen
         actors.add(boxViewButton);
         actors.add(overviewButton);
 
-        table.setFillParent(true);
+        widgetsTable.setFillParent(false);
+        widgetsTable.setSize(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
+        widgetsTable.top().left();
 
-        table.top().left();
-
-        table.add(createSearchButton(textField));
-        table.add(textField);
-        table.row();
-        table.add(createViewButton(actors));
-        table.add(homeButton).space(0);
-        table.add(floorViewButton);
-        table.add(boxViewButton);
-        table.add(overviewButton);
-        table.row();
-        table.add(createTransparentButton());
-        table.row();
-
-        stage.addActor(table);
+        infoTable.setFillParent(false);
+        infoTable.setSize(Gdx.graphics.getWidth() / 4, Gdx.graphics.getHeight());
+        infoTable.top().right();
+        infoTable.setPosition(3 * Gdx.graphics.getWidth() / 4, 0);
 
 
-        multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(stage);
-        multiplexer.addProcessor(application.getCameraInputController());
-        Gdx.input.setInputProcessor(multiplexer);
+        widgetsTable.add(createSearchButton(textField));
+        widgetsTable.add(textField);
+        widgetsTable.row();
+        widgetsTable.add(createViewButton(actors));
+        widgetsTable.add(homeButton);
+        widgetsTable.add(floorViewButton);
+        widgetsTable.add(boxViewButton);
+        widgetsTable.add(overviewButton);
+        widgetsTable.row();
+        widgetsTable.add(createTransparentButton());
+        widgetsTable.row();
+        widgetsTable.add(createLightsButton());
+        widgetsTable.row();
+
+        navScreen.getStage().addActor(infoTable);
+        navScreen.getStage().addActor(widgetsTable);
 
     }
+
 
     /**
      * Creates a {@link Search} type to be inserted in the table of HUD, to enable the
@@ -211,7 +132,7 @@ public class NavigationScreen
 
         defineStyle();
 
-        return new FloorView(style, application.getBuildingManager());
+        return new FloorView(style, manager);
     }
 
     /**
@@ -229,7 +150,7 @@ public class NavigationScreen
 
         defineStyle();
 
-        return new BoxView(style, application.getBuildingManager());
+        return new BoxView(style, manager);
     }
 
     /**
@@ -247,7 +168,7 @@ public class NavigationScreen
 
         defineStyle();
 
-        return new Overview(style, application.getBuildingManager());
+        return new Overview(style, manager);
     }
 
 
@@ -266,7 +187,7 @@ public class NavigationScreen
 
         defineStyle();
 
-        return new Home(style, application.getBuildingManager());
+        return new Home(style, manager);
     }
 
     /**
@@ -285,7 +206,26 @@ public class NavigationScreen
 
         defineStyle();
 
-        return new TransparentView(style, application.getBuildingManager());
+        return new TransparentView(style, manager);
+    }
+
+
+    /**
+     * Creates a {@link TransparentView} type to be inserted in the table of HUD, to set
+     * the default view of the system when pressed.
+     * 
+     * @return {@link TransparentView}
+     */
+    private Lights createLightsButton() {
+        upTextureRegion = new TextureRegion(new Texture(Gdx.files.internal(APP.LIGHTS_BUTTON)));
+        downTextureRegion =
+            new TextureRegion(new Texture(Gdx.files.internal(APP.LIGHTS_SELECTED_BUTTON)));
+        upImage = new TextureRegionDrawable(upTextureRegion);
+        downImage = new TextureRegionDrawable(downTextureRegion);
+
+        defineStyle();
+
+        return new Lights(style, manager);
     }
 
     private void defineStyle() {
@@ -312,7 +252,9 @@ public class NavigationScreen
             @Override
             public void keyTyped(TextField textField, char c) {
                 if (c == '\n' || c == '\r') {
-                    application.getBuildingManager().showRoom(textField.getText());
+                    manager.showRoom(textField.getText());
+                    if (manager.getRoom(textField.getText()) != null)
+                        showInfo(manager.getRoom(textField.getText()));
                     return;
                 }
             }
@@ -344,10 +286,54 @@ public class NavigationScreen
 
         return new ViewButton(style, actors);
     }
-    
-    public ModelInstance getPointer(){
-        return pointer;
+
+    /**
+     * Displays in the right side of the screen the information about the room.
+     * 
+     * @param the searched {@link Room}
+     */
+    public void showInfo(Room room) {
+        clearInfo();
+
+        //infoTable.debug();
+        
+        infoTable.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files
+                .internal("buttons/Table.png")))));
+        
+        infoTable.add(new Label("Room ID: " + room.getId(), uiSkin)).colspan(3).center()
+                .width(Gdx.graphics.getWidth() / 4);
+        infoTable.row();
+
+        infoTable.add(new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(
+                Gdx.files.internal(APP.LAMP_BUTTON))))));
+        infoTable.add(new Label("Light Consumption: ", uiSkin)).left();
+        infoTable.add(new Label(String.valueOf(room.getLightConsumption()) + "W", uiSkin)).left();
+        infoTable.row();
+
+        infoTable.add(new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(
+                Gdx.files.internal(APP.HVAC_BUTTON))))));
+        infoTable.add(new Label("Hvac Consumption: ", uiSkin)).left();
+        infoTable.add(new Label(String.valueOf(room.getHvacConsumption()) + "W", uiSkin)).left();
+        infoTable.row();
+
+        infoTable.add(new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(
+                Gdx.files.internal(APP.ELECTRICITY_BUTTON))))));
+        infoTable.add(new Label("Electric Consumption: ", uiSkin)).left();
+        infoTable.add(new Label(String.valueOf(room.getElectricityComsumption()) + "W", uiSkin))
+                .left();
+        infoTable.row();
+
+        infoTable.add(new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(
+                Gdx.files.internal(APP.PERSON_BUTTON))))));
+        infoTable.add(new Label("Ocupancy: ", uiSkin)).left();
+        infoTable.add(new Label(String.valueOf(room.getOcupancy()), uiSkin)).left();
+        infoTable.row();
     }
 
-
+    /**
+     * Clears the information displayed about some room.
+     */
+    public void clearInfo() {
+        infoTable.clear();
+    }
 }

@@ -1,6 +1,8 @@
-package com.ems3DNavigator.manager;
+package com.ems3DNavigator.buildingData;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.math.Vector3;
@@ -22,8 +24,43 @@ public class Room {
     private Node boxNode;
     private String id;
     private Vector3 position;
-    private float lightConsumption;
-    private Array<Node> walls = new Array<Node>();
+    private float lightConsumption = 10;
+    private float ocupancy = 0;
+    private float hvacConsumption = 10;
+    private float electricityComsumption = 10;
+    private PointLight light;
+    
+    public float getLightConsumption() {
+        return lightConsumption;
+    }
+
+    public void setLightConsumption(float lightConsumption) {
+        this.lightConsumption = lightConsumption;
+    }
+
+    public float getOcupancy() {
+        return ocupancy;
+    }
+
+    public void setOcupancy(float ocupancy) {
+        this.ocupancy = ocupancy;
+    }
+
+    public float getHvacConsumption() {
+        return hvacConsumption;
+    }
+
+    public void setHvacConsumption(float hvacConsumption) {
+        this.hvacConsumption = hvacConsumption;
+    }
+
+    public float getElectricityComsumption() {
+        return electricityComsumption;
+    }
+
+    public void setElectricityComsumption(float electricityComsumption) {
+        this.electricityComsumption = electricityComsumption;
+    }
 
     public Room(Node floorNode, String id, Vector3 position) {
         this.floorNode = floorNode;
@@ -136,6 +173,11 @@ public class Room {
     public void setLampNode(Node lamp) {
         this.lampNode = lamp;
         position = lamp.translation;
+        light = new PointLight().set(Color.WHITE, position, 0.05f);
+    }
+    
+    public PointLight getLight(){
+        return light;
     }
 
     public Node getLampNode() {
@@ -181,13 +223,5 @@ public class Room {
     public void deselectRoom() {
         setFloorMaterial(originalFloorMaterial);
         setBoxMaterial(originalBoxMaterial);
-    }
-    
-    public void addWall(Node n){
-        walls.add(n);
-    }
-    
-    public Array<Node> getWalls(){
-        return walls;
     }
 }

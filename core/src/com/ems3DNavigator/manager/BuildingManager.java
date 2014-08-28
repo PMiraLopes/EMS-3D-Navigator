@@ -4,11 +4,15 @@ import java.util.Hashtable;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.model.Node;
+import com.ems3DNavigator.app.Ems3DNavigator;
+import com.ems3DNavigator.buildingData.Room;
 import com.ems3DNavigator.constants.APP;
 
 /**
@@ -26,6 +30,7 @@ public class BuildingManager {
     private Room lastRoomSelected;
     private FileHandle fileHandle;
     private boolean transparencyEnabled = false;
+    private boolean lightsOn = false;
 
     public BuildingManager(Ems3DNavigator app, ModelInstance model) {
         this.app = app;
@@ -143,11 +148,10 @@ public class BuildingManager {
         float x = r.getX();
         float y = r.getY();
         float z = r.getZ();
-        
+
         app.getNavigationScreen().getPointer().transform.setTranslation(r.getX(), r.getY() + 5,
                                                                         r.getZ());
         app.getNavigationScreen().getPointer().nodes.get(0).parts.get(0).enabled = true;
-      
 
         app.getPerspectiveCamera().position.set(x, y + 30, z + 30);
         app.getPerspectiveCamera().lookAt(r.getPositionVector());
@@ -246,6 +250,24 @@ public class BuildingManager {
             for (Material m : model.materials)
                 m.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1f));
             transparencyEnabled = false;
+        }
+    }
+    
+    public void turnLights(){
+        if(!lightsOn){
+            for(Room r : buildingRooms.values()){
+                if(r.getLampNode() != null)
+                    app.getNavigationScreen().getEnvironment() // The lamps have light
+                    .add( r.getLight());
+            }
+            lightsOn = true;
+        }else{
+            for(Room r : buildingRooms.values()){
+                if(r.getLampNode() != null)
+                    app.getNavigationScreen().getEnvironment() // The lamps have light
+                    .remove( r.getLight());
+            }
+            lightsOn = false;
         }
     }
 }

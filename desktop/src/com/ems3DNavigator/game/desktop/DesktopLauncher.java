@@ -2,7 +2,7 @@ package com.ems3DNavigator.game.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.ems3DNavigator.manager.Ems3DNavigator;
+import com.ems3DNavigator.app.Ems3DNavigator;
 
 public class DesktopLauncher{
     public static void main(String[] arg){

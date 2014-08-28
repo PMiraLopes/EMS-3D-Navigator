@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.ems3DNavigator.manager.Ems3DNavigator;
+import com.ems3DNavigator.app.Ems3DNavigator;
 
 
 // TODO: Auto-generated Javadoc
