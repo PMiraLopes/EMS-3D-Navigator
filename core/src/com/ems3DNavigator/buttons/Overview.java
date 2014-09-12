@@ -35,7 +35,7 @@ public class Overview extends ImageButton{
     }
     
     /**
-     * Overview.
+     * Sets the overview view as the active view of the system.
      */
     private void overview(){
         this.manager.setOverView();

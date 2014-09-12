@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -17,7 +18,8 @@ import com.ems3DNavigator.screens.NavigationScreen;
 
 /**
  * This is the base class of the program, it is used when the program starts setting the
- * values to the cameras, batch, and loading the models that going to be displayed to user.
+ * values to the cameras, batch, and loading the models that going to be displayed to
+ * user.
  * 
  * @author PedroLopes
  */
@@ -27,6 +29,7 @@ public class Ems3DNavigator
 
     private ModelBatch batch;
     private PerspectiveCamera camera3D;
+    private OrthographicCamera camera2D;
     private AssetManager assets;
     private NavigationScreen navigationScreen;
     private CameraInputController cameraController;
@@ -46,7 +49,7 @@ public class Ems3DNavigator
 
         assets = new AssetManager();
 
-        setCamera();
+        cameraDefaultPos();
 
         loadModel(APP.MODEL);
 
@@ -123,7 +126,7 @@ public class Ems3DNavigator
     /**
      * Returns the CameraInputController object.
      * 
-     * @return C
+     * @return {@link CameraInputController}
      */
     public CameraInputController getCameraInputController() {
         return cameraController;
@@ -132,23 +135,42 @@ public class Ems3DNavigator
     /**
      * Function to the set values of the default perspective camera.
      */
-    public void setCamera() {
+    public void cameraDefaultPos() {
         camera3D = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera3D.position.set(100.0f, 50.0f, 50.0f);
         camera3D.lookAt(100.0f, 0.0f, 0.0f);
         camera3D.near = 1.0f;
         camera3D.far = 200.0f;
         camera3D.update();
+        
+        camera2D = new OrthographicCamera(Gdx.graphics.getWidth()/4, Gdx.graphics.getHeight()/4);
+        camera2D.zoom = 4;
 
         setCameraAsInputController();
     }
 
+    /**
+     * Reset camera position.
+     */
     public void resetCamera() {
         camera3D.position.set(100.0f, 50.0f, 50.0f);
         camera3D.lookAt(50.0f, 0.0f, 0.0f);
         camera3D.near = 1.0f;
         camera3D.far = 300.0f;
         camera3D.up.set(Vector3.Y);
+        camera3D.update();
+    }
+
+    /**
+     * Sets the camera position.
+     *
+     * @param pos the camera position
+     */
+    public void setCameraPos(Vector3 pos) {
+        camera3D.position.set(pos.x, pos.y + 30, pos.z + 30);
+        camera3D.lookAt(pos);
+        camera3D.near = 1.0f;
+        camera3D.far = 300.0f;
         camera3D.update();
     }
 
@@ -164,13 +186,11 @@ public class Ems3DNavigator
     /**
      * Creates the building manager.
      *
-     * @param {@link ModelInstance} modelInstance
+     * @param modelInstance the model instance
      */
     public void createBuildingManager(ModelInstance modelInstance) {
         buildingManager = new BuildingManager(this, modelInstance);
-        buildingManager.setNormalView();
         navigationScreen.getPointer().nodes.get(0).parts.get(0).enabled = false;
-
     }
 
     /**
@@ -180,6 +200,10 @@ public class Ems3DNavigator
      */
     public BuildingManager getBuildingManager() {
         return buildingManager;
+    }
+    
+    public OrthographicCamera getOrthographicCamera(){
+        return camera2D;
     }
 
 }

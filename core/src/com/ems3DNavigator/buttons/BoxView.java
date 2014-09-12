@@ -37,7 +37,7 @@ public class BoxView
     }
 
     /**
-     * Box view.
+     * Calls the {@link BuildingManager} Box view fucntion.
      */
     private void boxView() {
         this.manager.setBoxesView();

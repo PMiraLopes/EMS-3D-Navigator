@@ -40,7 +40,7 @@ public class FloorView
     }
 
     /**
-     * Floor view.
+     * Calls the function of the manager that implements this kind of view.
      */
     private void floorView() {
         this.manager.setFloorView();

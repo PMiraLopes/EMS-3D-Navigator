@@ -20,8 +20,8 @@ public class TransparentView
     /**
      * The Constructor.
      *
-     * @param ImageButtonStyle style
-     * @param BuildingManager manager
+     * @param style the style
+     * @param manager the manager
      */
     public TransparentView(ImageButtonStyle style, BuildingManager manager) {
         super(style);

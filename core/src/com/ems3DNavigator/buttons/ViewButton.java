@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Array;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class ViewButton.
+ * The Class ViewButton is a button to show/hide all available views of the system to the user.
  */
 public class ViewButton
         extends ImageButton {
@@ -38,7 +38,7 @@ public class ViewButton
 
         addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                showTextBox();
+                showViews();
                 return true;
             }
         });
@@ -46,23 +46,21 @@ public class ViewButton
     }
 
     /**
-     * Sets the text box as visible or invisible, and allows the user to insert input with
-     * the keyboard.
+     * Show/Hide the different kinds of views of the system.
      */
-    public void showTextBox() {
+    public void showViews() {
         if (!active) {
             for (Actor actor : actors) {
                 actor.setTouchable(Touchable.enabled);
                 actor.setVisible(true);
             }
-            active = true;
         } else {
 
             for (Actor actor : actors) {
                 actor.setTouchable(Touchable.disabled);
                 actor.setVisible(false);
             }
-            active = false;
         }
+        active = !active;
     }
 }

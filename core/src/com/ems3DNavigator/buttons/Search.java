@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.ems3DNavigator.manager.BuildingManager;
 
 /**
- * The Class Search to allow the user to seach for a desired room.
+ * The Class Search to allow the user to search for a desired room.
  */
 public class Search
         extends ImageButton {
@@ -17,6 +17,8 @@ public class Search
      * The text box for user input.
      */
     private Actor textBox;
+    
+    private Actor roomInfoTable;
 
     /**
      * Flag to know if the text box is being displayed or not.
@@ -26,14 +28,15 @@ public class Search
     /**
      * The Constructor.
      *
-     * @param {@link ImageButtonStyle}
-     * @param {@link BuildingManager}BuildingManager
-     * @param {@link Actor}
+     * @param style the style
+     * @param textbox the actor
      */
-    public Search(ImageButtonStyle style, Actor actor) {
+    public Search(ImageButtonStyle style, Actor textbox, Actor table) {
         super(style);
 
-        this.textBox = actor;
+        this.textBox = textbox;
+        
+        this.roomInfoTable = table;
 
         addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -56,6 +59,7 @@ public class Search
         } else {
             textBox.setTouchable(Touchable.disabled);
             textBox.setVisible(false);
+            roomInfoTable.setVisible(false);
             active = false;
         }
     }

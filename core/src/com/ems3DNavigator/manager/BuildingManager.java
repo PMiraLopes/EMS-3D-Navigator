@@ -1,16 +1,25 @@
 package com.ems3DNavigator.manager;
 
-import java.util.Hashtable;
+import ifc2x3javatoolbox.ifc2x3tc1.IfcBuildingElementProxy;
+import ifc2x3javatoolbox.ifc2x3tc1.IfcFlowTerminal;
+import ifc2x3javatoolbox.ifc2x3tc1.IfcRelSpaceBoundary;
+import ifc2x3javatoolbox.ifc2x3tc1.IfcSpace;
+import ifc2x3javatoolbox.ifcmodel.IfcModel;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
+import java.io.File;
+import java.util.Collection;
+import java.util.TreeMap;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.PointLight;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.utils.Array;
 import com.ems3DNavigator.app.Ems3DNavigator;
 import com.ems3DNavigator.buildingData.Room;
 import com.ems3DNavigator.constants.APP;
@@ -23,26 +32,27 @@ import com.ems3DNavigator.constants.APP;
  * @author PedroLopes
  */
 public class BuildingManager {
-
-    private Hashtable<String, Room> buildingRooms;
+    private TreeMap<String, Room> buildingRooms;
     private ModelInstance model;
     private Ems3DNavigator app;
-    private Room lastRoomSelected;
-    private FileHandle fileHandle;
-    private boolean transparencyEnabled = false;
-    private boolean lightsOn = false;
+    private boolean transparencyEnabled = false, lightsOn = false, heatOn = false, coldOn = false;
+    private IfcModel ifcModel;
 
     public BuildingManager(Ems3DNavigator app, ModelInstance model) {
         this.app = app;
         this.model = model;
 
-        buildingRooms = new Hashtable<String, Room>();
+        buildingRooms = new TreeMap<String, Room>();
 
-        fileHandle = Gdx.files.internal(APP.BUILDINGS + "tagus.ifc");
+        File ifcFile = new File(APP.BUILDINGS + APP.IFC_FILE_NAME);
+        ifcModel = new IfcModel();
 
+        try {
+            ifcModel.readStepFile(ifcFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         createRooms();
-
-        lastRoomSelected = null;
     }
 
 
@@ -51,72 +61,69 @@ public class BuildingManager {
      * creating the rooms with hvac model, lamp model, and floor model.
      */
     private void createRooms() {
-        String[] split, splitIfc, splitIfcAux;
-        String floorId = "", lampId = "", hvacId = "", ifcFile, nodeId, roomId;
+        String[] split;
+        String roomId = "", relatedId = "";
+        Collection<IfcRelSpaceBoundary> associations;
+        Array<Node> walls;
+        Node floorNode = null;
+        Room newRoom;
 
-        System.out.println("Loading rooms data...");
+        System.err.println("Loading rooms data...");
 
-        ifcFile = fileHandle.readString();
+        for (IfcSpace space : ifcModel.getCollection(IfcSpace.class)) {
+            walls = new Array<Node>();
+            BoundingBox boundingBox = new BoundingBox();
+            associations = space.getBoundedBy_Inverse();
 
-        for (Node n : model.nodes) {
-            if (n.id.contains("Painel do sistema"))
-                n.parts.get(0).material.set(new BlendingAttribute(GL20.GL_SRC_ALPHA,
-                        GL20.GL_ONE_MINUS_SRC_ALPHA, 0.5f));
-            //Just to show the glass doors
-            else
-                n.parts.get(0).material.set(new BlendingAttribute(GL20.GL_SRC_ALPHA,
-                        GL20.GL_ONE_MINUS_SRC_ALPHA, 1f));
+            for (IfcRelSpaceBoundary e : associations) {
+                if (e.getRelatedBuildingElement() != null) {
+                    relatedId = e.getRelatedBuildingElement().getName().toString();
 
-            if (n.id.contains("Floor:ID")) {
-                split = n.id.split("#");
-                floorId = split[1];
+                    if (relatedId.contains("Floor")) { //is a generic floor, not specific to a room.
+                        floorNode = model.getNode(relatedId);
+                        floorNode.calculateBoundingBox(boundingBox);
 
-                if (!floorId.contains(".0"))
-                    // to avoid create wrong rooms, because of the group nodes
-                    buildingRooms.put(floorId, new Room(n, floorId));
-            }
-        }
-
-        for (Node k : model.nodes) {
-            if (k.id.contains("lamp")) {
-                split = k.id.split("#");
-                lampId = split[1];
-                if (buildingRooms.containsKey(lampId)) {
-                    buildingRooms.get(lampId).setLampNode(k);
-                    buildingRooms.get(lampId).setPositionVector(k.translation);
-                }
-            } else {
-                if (k.id.contains("hvac")) {
-                    split = k.id.split("#");
-                    hvacId = split[1];
-                    if (buildingRooms.containsKey(hvacId))
-                        buildingRooms.get(hvacId).setHvacNode(k);
-
+                        if (relatedId.contains("Floor:ID"))
+                            // this floor is specific to a room, so represents the room id.
+                            roomId = relatedId.split("#")[1];
+                        else
+                            roomId = relatedId;
+                    } else if (relatedId.contains("Wall")){
+                        if(model.getNode(relatedId) != null)   
+                            walls.add(model.getNode(relatedId));
+                    }
                 }
             }
+
+            newRoom = new Room(floorNode, roomId, boundingBox.getCenter());
+            newRoom.setBoxNode(model.getNode(space.getGlobalId().toString()));
+            newRoom.setWalls(walls);
+            buildingRooms.put(roomId, newRoom);
         }
 
-        splitIfc = ifcFile.split("\\r?\\n");
-
-        for (int i = 0; i < splitIfc.length; i++) {
-
-            if (splitIfc[i].contains("IFCSPACE")) {
-                splitIfcAux = splitIfc[i].split("'");
-                nodeId = splitIfcAux[1];
-                roomId = splitIfcAux[5].replace(",", ".");
-
-                if (model.getNode(nodeId) != null && buildingRooms.get(roomId) != null)
-                    buildingRooms.get(roomId).setBoxNode(model.getNode(nodeId));
-            }
+        for (IfcBuildingElementProxy element : ifcModel
+                .getCollection(IfcBuildingElementProxy.class)) {
+            split = element.getName().toString().split("#");
+            if (buildingRooms.containsKey(split[1]))
+                buildingRooms.get(split[1]).setHvacNode(model.getNode(element.getName()
+                                                                .getDecodedValue()));
         }
 
-        System.out.println("Rooms loaded...");
+        for (IfcFlowTerminal element : ifcModel.getCollection(IfcFlowTerminal.class)) {
+            split = element.getName().toString().split("#");
+            if (buildingRooms.containsKey(split[1]))
+                buildingRooms.get(split[1]).setLampNode(model.getNode(element.getName()
+                                                                .getDecodedValue()));
+        }
+
+        System.err.println("Rooms loaded...");
+        setNormalView();
     }
 
     /**
      * Function to retrieve a room by it's own id, if not exits returns null.
-     * 
-     * @param roomID
+     *
+     * @param roomID the room id
      * @return the room
      */
     public Room getRoom(String roomID) {
@@ -127,16 +134,15 @@ public class BuildingManager {
      * Prints the id of all rooms of the model.
      */
     public void printRooms() {
-        for (Room r : buildingRooms.values()) {
-            System.out.println(r.getId());
-        }
+        for (Room r : buildingRooms.values()) 
+            System.err.println(r.getId());
     }
 
 
     /**
      * Function to show to the user the room that has been searched in the text box.
-     * 
-     * @param {@link String} text
+     *
+     * @param text the text
      * @return {@link Boolean}
      */
     public boolean showRoom(String text) {
@@ -145,26 +151,18 @@ public class BuildingManager {
         if (r == null)
             return false; //Maybe thrown an exception
 
-        float x = r.getX();
-        float y = r.getY();
-        float z = r.getZ();
+        Vector3 roomPos = r.getPosition();
 
-        app.getNavigationScreen().getPointer().transform.setTranslation(r.getX(), r.getY() + 5,
-                                                                        r.getZ());
+      /*  for (Room otherRoom : buildingRooms.values())
+            otherRoom.hideWalls();
+        
+        r.showWalls();*/
+        
+        app.getNavigationScreen().getPointer().transform.setTranslation(roomPos.x, roomPos.y + 5,
+                                                                        roomPos.z);
         app.getNavigationScreen().getPointer().nodes.get(0).parts.get(0).enabled = true;
 
-        app.getPerspectiveCamera().position.set(x, y + 30, z + 30);
-        app.getPerspectiveCamera().lookAt(r.getPositionVector());
-        app.getPerspectiveCamera().near = 1.0f;
-        app.getPerspectiveCamera().far = 300.0f;
-        app.getPerspectiveCamera().update();
-
-        if (lastRoomSelected == null || lastRoomSelected.equals(r))
-            lastRoomSelected = r;
-        else {
-            lastRoomSelected.deselectRoom();
-            lastRoomSelected = r;
-        }
+        app.setCameraPos(roomPos);
 
         return true;
     }
@@ -238,12 +236,15 @@ public class BuildingManager {
         }
     }
 
+    /**
+     * Sets the transparent view over all buildings.
+     */
     public void setTransparentView() {
         if (!transparencyEnabled) {
             for (Node n : model.nodes)
                 if (!(n.id.contains("hvac") || n.id.contains("lamp")))
                     n.parts.get(0).material.set(new BlendingAttribute(GL20.GL_SRC_ALPHA,
-                            GL20.GL_ONE_MINUS_SRC_ALPHA, 0.2f));
+                            GL20.GL_ONE_MINUS_SRC_ALPHA, 0.4f));
             transparencyEnabled = true;
         } else {
 
@@ -252,22 +253,71 @@ public class BuildingManager {
             transparencyEnabled = false;
         }
     }
-    
-    public void turnLights(){
-        if(!lightsOn){
-            for(Room r : buildingRooms.values()){
-                if(r.getLampNode() != null)
+
+    /**
+     * Turn lights on/off.
+     */
+    public void turnLights() {
+        if (!lightsOn) {
+            for (Room r : buildingRooms.values()) {
+                if (r.getLampNode() != null)
                     app.getNavigationScreen().getEnvironment() // The lamps have light
-                    .add( r.getLight());
+                            .add(r.getRoomLight());
             }
             lightsOn = true;
-        }else{
-            for(Room r : buildingRooms.values()){
-                if(r.getLampNode() != null)
+        } else {
+            for (Room r : buildingRooms.values()) {
+                if (r.getLampNode() != null)
                     app.getNavigationScreen().getEnvironment() // The lamps have light
-                    .remove( r.getLight());
+                            .remove(r.getRoomLight());
             }
             lightsOn = false;
         }
+    }
+
+    /**
+     * Turn heat on/off.
+     */
+    public void turnHeat() {
+        if (!heatOn) {
+            for (Room r : buildingRooms.values()) {
+                if (r.getHvacNode() != null)
+                    r.getHvacNode().parts.get(0).material =
+                        new Material(ColorAttribute.createDiffuse(Color.RED));
+            }
+            heatOn = true;
+        } else {
+            for (Room r : buildingRooms.values()) {
+                if (r.getHvacNode() != null)
+                    r.getHvacNode().parts.get(0).material =
+                        new Material(ColorAttribute.createDiffuse(Color.GRAY));
+            }
+            heatOn = false;
+        }
+    }
+
+    /**
+     * Turn cold. on/off
+     */
+    public void turnCold() {
+        if (!coldOn) {
+            for (Room r : buildingRooms.values()) {
+                if (r.getHvacNode() != null)
+                    r.getHvacNode().parts.get(0).material =
+                        new Material(ColorAttribute.createDiffuse(Color.BLUE));
+            }
+            coldOn = true;
+        } else {
+            for (Room r : buildingRooms.values()) {
+                if (r.getHvacNode() != null)
+                    r.getHvacNode().parts.get(0).material =
+                        new Material(ColorAttribute.createDiffuse(Color.GRAY));
+            }
+            coldOn = false;
+        }
+    }
+    
+    public Collection<Room> getRooms(){
+        return buildingRooms.values();
     }
 }

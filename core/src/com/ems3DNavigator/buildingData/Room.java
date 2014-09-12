@@ -1,7 +1,10 @@
 package com.ems3DNavigator.buildingData;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.g3d.model.Node;
@@ -16,212 +19,251 @@ import com.badlogic.gdx.utils.Array;
  */
 
 public class Room {
+
+    private String id;
+    private Vector3 position;
+
     private Material originalFloorMaterial;
     private Material originalBoxMaterial;
+
     private Node floorNode;
     private Node lampNode;
     private Node hvacNode;
     private Node boxNode;
-    private String id;
-    private Vector3 position;
+    private Array<Node> walls;
+
     private float lightConsumption = 10;
-    private float ocupancy = 0;
+    private float roomOcupancy = 0;
     private float hvacConsumption = 10;
     private float electricityComsumption = 10;
-    private PointLight light;
-    
-    public float getLightConsumption() {
-        return lightConsumption;
-    }
-
-    public void setLightConsumption(float lightConsumption) {
-        this.lightConsumption = lightConsumption;
-    }
-
-    public float getOcupancy() {
-        return ocupancy;
-    }
-
-    public void setOcupancy(float ocupancy) {
-        this.ocupancy = ocupancy;
-    }
-
-    public float getHvacConsumption() {
-        return hvacConsumption;
-    }
-
-    public void setHvacConsumption(float hvacConsumption) {
-        this.hvacConsumption = hvacConsumption;
-    }
-
-    public float getElectricityComsumption() {
-        return electricityComsumption;
-    }
-
-    public void setElectricityComsumption(float electricityComsumption) {
-        this.electricityComsumption = electricityComsumption;
-    }
+    private float area;
+    private float volume;
+    private float perimeter;
+    private DirectionalLight roomLight;
 
     public Room(Node floorNode, String id, Vector3 position) {
         this.floorNode = floorNode;
         this.id = id;
         this.position = position;
         originalFloorMaterial = floorNode.parts.get(0).material;
+        this.walls = new Array<Node>();
     }
 
     public Room(Node floorNode, String id) {
         this.floorNode = floorNode;
         this.id = id;
         originalFloorMaterial = floorNode.parts.get(0).material;
+        this.walls = new Array<Node>();
     }
 
     /**
-     * Returns the Floor {@link Node} of the room.
-     * 
-     * @return {@link Node}
+     * @return the position
+     */
+    public Vector3 getPosition() {
+        return position;
+    }
+
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(Vector3 position) {
+        this.position = position;
+    }
+
+    /**
+     * @return the originalFloorMaterial
+     */
+    public Material getOriginalFloorMaterial() {
+        return originalFloorMaterial;
+    }
+
+    /**
+     * @param originalFloorMaterial the originalFloorMaterial to set
+     */
+    public void setOriginalFloorMaterial(Material originalFloorMaterial) {
+        this.originalFloorMaterial = originalFloorMaterial;
+    }
+
+    /**
+     * @return the originalBoxMaterial
+     */
+    public Material getOriginalBoxMaterial() {
+        return originalBoxMaterial;
+    }
+
+    /**
+     * @param originalBoxMaterial the originalBoxMaterial to set
+     */
+    public void setOriginalBoxMaterial(Material originalBoxMaterial) {
+        this.originalBoxMaterial = originalBoxMaterial;
+    }
+
+    /**
+     * @return the floorNode
      */
     public Node getFloorNode() {
         return floorNode;
     }
 
     /**
-     * Returns the Box {@link Node} of the room.
-     * 
-     * @return {@link Node}
+     * @param floorNode the floorNode to set
+     */
+    public void setFloorNode(Node floorNode) {
+        this.floorNode = floorNode;
+        setOriginalFloorMaterial(floorNode.parts.get(0).material);
+    }
+
+    /**
+     * @return the lampNode
+     */
+    public Node getLampNode() {
+        return lampNode;
+    }
+
+    /**
+     * @param lampNode the lampNode to set
+     */
+    public void setLampNode(Node lampNode) {
+        this.lampNode = lampNode;
+        setRoomLight(new DirectionalLight().set(Color.WHITE, position));
+    }
+
+    /**
+     * @return the hvacNode
+     */
+    public Node getHvacNode() {
+        return hvacNode;
+    }
+
+    /**
+     * @param hvacNode the hvacNode to set
+     */
+    public void setHvacNode(Node hvacNode) {
+        this.hvacNode = hvacNode;
+    }
+
+    /**
+     * @return the boxNode
      */
     public Node getBoxNode() {
         return boxNode;
     }
 
     /**
-     * Returns the {@link Room} own Id.
-     * 
-     * @return {@link String}
+     * @param boxNode the boxNode to set
+     */
+    public void setBoxNode(Node boxNode) {
+        this.boxNode = boxNode;
+    }
+
+    /**
+     * @return the roomLight
+     */
+    public DirectionalLight getRoomLight() {
+        return roomLight;
+    }
+
+    /**
+     * @param roomLight the roomLight to set
+     */
+    public void setRoomLight(DirectionalLight roomLight) {
+        this.roomLight = roomLight;
+    }
+
+    /**
+     * @return the id
      */
     public String getId() {
         return id;
     }
 
     /**
-     * Returns the Floor {@link Material} of the {@link Room}.
-     * 
-     * @return {@link Material}
+     * @return the lightConsumption
      */
-    public Material getFloorMaterial() {
-        return floorNode.parts.get(0).material;
+    public float getLightConsumption() {
+        return lightConsumption;
     }
 
     /**
-     * Returns the {@link MeshPart} of the Floor node of the {@link Room}.
-     * 
-     * @return {@link MeshPart}
+     * @return the roomOcupancy
      */
-    public MeshPart getFloorMesh() {
-        return floorNode.parts.get(0).meshPart;
+    public float getRoomOcupancy() {
+        return roomOcupancy;
     }
 
     /**
-     * Returns the x coordinate of the {@link Room} position.
-     * 
-     * @return {@link Float}
+     * @return the hvacConsumption
      */
-    public float getX() {
-        return position.x;
+    public float getHvacConsumption() {
+        return hvacConsumption;
     }
 
     /**
-     * Returns the y coordinate of the {@link Room} position.
-     * 
-     * @return {@link Float}
+     * @return the electricityComsumption
      */
-    public float getY() {
-        return position.y;
+    public float getElectricityComsumption() {
+        return electricityComsumption;
     }
 
     /**
-     * Returns the z coordinate of the {@link Room} position.
-     * 
-     * @return {@link Float}
+     * @return the area
      */
-    public float getZ() {
-        return position.z;
+    public float getArea() {
+        return area;
     }
 
     /**
-     * Sets the {@link Room} position to a given position.
-     * 
-     * @param {@link Vector3} position
+     * @param area the area to set
      */
-    public void setPositionVector(Vector3 position) {
-        this.position = position;
+    public void setArea(float area) {
+        this.area = area;
     }
 
     /**
-     * Returns the {@link Room}'s position.
-     * 
-     * @return {@link Vector3}
+     * @return the volume
      */
-    public Vector3 getPositionVector() {
-        return position;
+    public float getVolume() {
+        return volume;
     }
 
     /**
-     * Sets the {@link Room}'s lamp {@link Node} to a given node.
-     * 
-     * @param {@link Node} lamp
+     * @param volume the volume to set
      */
-    public void setLampNode(Node lamp) {
-        this.lampNode = lamp;
-        position = lamp.translation;
-        light = new PointLight().set(Color.WHITE, position, 0.05f);
+    public void setVolume(float volume) {
+        this.volume = volume;
+    }
+
+    /**
+     * @return the perimeter
+     */
+    public float getPerimeter() {
+        return perimeter;
+    }
+
+    /**
+     * @param perimeter the perimeter to set
+     */
+    public void setPerimeter(float perimeter) {
+        this.perimeter = perimeter;
+    }
+
+    public Array<Node> getWalls() {
+        return walls;
+    }
+
+    public void setWalls(Array<Node> walls) {
+        this.walls = walls;
+    }
+
+    public void hideWalls() {
+        for (Node n : walls){
+            n.parts.get(0).enabled = false;
+        }
     }
     
-    public PointLight getLight(){
-        return light;
+    public void showWalls() {
+        for (Node n : walls)
+            n.parts.get(0).enabled = true;
     }
 
-    public Node getLampNode() {
-        return lampNode;
-    }
-
-    /**
-     * Sets the {@link Room} Hvac {@link Node}.
-     * 
-     * @param hvac Node
-     */
-    public void setHvacNode(Node hvac) {
-        this.hvacNode = hvac;
-    }
-
-    /**
-     * Sets the {@link Room} Box {@link Node}.
-     * 
-     * @param box Node
-     */
-    public void setBoxNode(Node box) {
-        this.boxNode = box;
-        originalBoxMaterial = box.parts.get(0).material;
-    }
-
-    public Node getHvacNode() {
-        return hvacNode;
-    }
-
-    public void setFloorMaterial(Material m) {
-        floorNode.parts.get(0).material = m;
-    }
-
-    public void setBoxMaterial(Material m) {
-        boxNode.parts.get(0).material = m;
-    }
-
-    public void selectRoom(Material m) {
-        setFloorMaterial(m);
-        setBoxMaterial(m);
-    }
-
-    public void deselectRoom() {
-        setFloorMaterial(originalFloorMaterial);
-        setBoxMaterial(originalBoxMaterial);
-    }
 }

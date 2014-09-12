@@ -115,8 +115,8 @@ public class NavigationScreen
 
     /**
      * Function to render the model and the HUD.
-     * 
-     * @param {@link Float} delta
+     *
+     * @param delta the delta
      */
     @Override
     public void render(float delta) {
