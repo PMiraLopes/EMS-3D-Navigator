@@ -7,35 +7,19 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.ems3DNavigator.app.Ems3DNavigator;
-import com.ems3DNavigator.buttons.BoxView;
-import com.ems3DNavigator.buttons.FloorView;
-import com.ems3DNavigator.buttons.Home;
-import com.ems3DNavigator.buttons.Overview;
-import com.ems3DNavigator.buttons.Search;
-import com.ems3DNavigator.buttons.TransparentView;
-import com.ems3DNavigator.buttons.ViewButton;
 import com.ems3DNavigator.constants.APP;
 import com.ems3DNavigator.manager.BuildingManager;
 import com.ems3DNavigator.manager.InterfaceManager;
@@ -61,6 +45,7 @@ public class NavigationScreen
     private ModelInstance pointer;
     private InterfaceManager interfaceManager;
     private InputMultiplexer multiplexer;
+    private ModelBuilder modelBuilder;
 
     public NavigationScreen(Ems3DNavigator app) {
 
@@ -71,7 +56,7 @@ public class NavigationScreen
         env.add(new DirectionalLight().set(0.4f, 0.4f, 0.4f, -1.0f, -1.0f, -1.0f));
 
         stage = new Stage();
-        
+
         loading = true;
 
     }
@@ -88,19 +73,21 @@ public class NavigationScreen
         modelInstances.add(new ModelInstance(application.getAssetManager()
                 .get(APP.BUILDINGS + APP.MODEL + APP.MODEL_EXTENSION, Model.class)));
 
-        ModelBuilder modelBuilder = new ModelBuilder();
+        modelBuilder = new ModelBuilder();
         Model cone =
             modelBuilder.createCone(2, 2, 2, 100,
                                     new Material(ColorAttribute.createDiffuse(Color.GREEN)),
                                     Usage.Position | Usage.Normal);
-        
+
         pointer = new ModelInstance(cone);
         pointer.transform.rotate(Vector3.Z, 180);
-        
+
         modelInstances.add(pointer);
+       //modelInstances.add(createFloor());
+      // modelInstances.add(createSkyBox());
 
         application.createBuildingManager(modelInstances.first());
-        
+
         interfaceManager = new InterfaceManager(this, application.getBuildingManager());
         interfaceManager.setHUD();
 
@@ -146,13 +133,39 @@ public class NavigationScreen
     public ModelInstance getPointer() {
         return pointer;
     }
-    
-    public Stage getStage(){
+
+    public Stage getStage() {
         return stage;
     }
-    
-    public Environment getEnvironment(){
+
+    public Environment getEnvironment() {
         return env;
+    }
+
+    private ModelInstance createFloor() {
+        Texture texture = new Texture(Gdx.files.internal(APP.BUTTONS + "grass.jpg"));
+        Material m = new Material(new TextureAttribute(TextureAttribute.Diffuse, texture));
+        Model rec =
+            modelBuilder.createBox(256, 1, 256, m, Usage.Position | Usage.Normal
+                    | Usage.TextureCoordinates);
+        ModelInstance floor = new ModelInstance(rec);
+       // floor.transform.setToRotation(0, 1, 0, 15);
+        floor.transform.setTranslation(new Vector3(0,-2,0));
+
+        return floor;
+    }
+    
+    private ModelInstance createSkyBox() {
+        Texture texture = new Texture(Gdx.files.internal(APP.BUTTONS + "skybox.jpg"));
+        Material m = new Material(new TextureAttribute(TextureAttribute.Diffuse, texture));
+        Model rec =
+            modelBuilder.createSphere(300, 300, 300, 150, 150, m,  Usage.Position | Usage.Normal
+                                      | Usage.TextureCoordinates);
+        ModelInstance sky = new ModelInstance(rec);
+        sky.materials.get(0).set(new IntAttribute(IntAttribute.CullFace, 0));
+
+
+        return sky;
     }
 
 }
